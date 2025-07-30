@@ -1,9 +1,6 @@
-vim.cmd [[nnoremap H ^]]
-vim.cmd [[nnoremap L $]]
-vim.cmd [[xnoremap H ^]]
-vim.cmd [[xnoremap L $]]
+vim.keymap.set({ 'n', 'v' }, 'j', 'gj')
+vim.keymap.set({ 'n', 'v' }, 'k', 'gk')
+vim.keymap.set({ 'n', 'v' }, 'H', 'g^')
+vim.keymap.set({ 'n', 'v' }, 'L', 'g$')
 
-vim.cmd [[nnoremap j gj]]
-vim.cmd [[nnoremap k gk]]
-vim.cmd [[nnoremap H g^]]
-vim.cmd [[nnoremap L g$]]
+vim.cmd[[ setlocal spell spelllang=en_gb ]]

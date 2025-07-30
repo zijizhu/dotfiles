@@ -4,30 +4,34 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-vim.opt.guicursor = 'n-v-sm:block-Cursor,c-i-ci-ve:block'
-vim.keymap.set({ 'n', 'x' }, 's', '<Nop>')
+-- Disable the default behaviour of <s> key in normal mode
+vim.keymap.set({ 'n', 'v' }, 's', '<Nop>')
 
--- Remap some keys
-vim.cmd [[nnoremap H ^]]
-vim.cmd [[nnoremap L $]]
-vim.cmd [[xnoremap H ^]]
-vim.cmd [[xnoremap L $]]
+vim.keymap.set({ 'n', 'v' }, 'H', '^')
+vim.keymap.set({ 'n', 'v' }, 'L', '$')
 
+-- [[ Clipboard and Register Settings ]]
 -- Sync clipboard between OS and Neovim.
 vim.opt.clipboard = 'unnamedplus'
+-- In visual mode, put text without overwriting the register
+vim.api.nvim_set_keymap('x', 'p', 'P', { noremap = true, silent = true })
 
 -- https://stackoverflow.com/q/916875/17662217
-vim.cmd [[noremap <Leader>p :let @+=expand("%")<CR>]]
+vim.keymap.set({ 'n' }, '<Leader>p', ':let @+=expand("%")<CR>')
+vim.keymap.set('n', '<leader>ft', ':TodoTelescope<enter>')
 
+-- [[ Default Tab and Indentation Settings ]]
+-- Language specific settings are in ./after/ftplugin/
 vim.o.tabstop = 2 -- size of a hard tabstop (ts).
 vim.o.shiftwidth = 2 -- size of an indentation (sw).
 vim.o.expandtab = true -- always uses spaces instead of tab characters (et).
 vim.o.softtabstop = 2 -- number of spaces a <Tab> counts for. When 0, feature is off (sts).
 
-vim.o.pumheight = 10 -- limit popup height
+vim.o.pumheight = 20 -- limit popup height
 vim.o.number = true -- display line number
 
 vim.o.relativenumber = true
+vim.o.breakindent = true
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -43,6 +47,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 
 vim.opt.rtp:prepend(lazypath)
-
 -- [[ Setup plugins ]]
 require("lazy").setup("plugins")
+
+require('user_commands')

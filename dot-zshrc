@@ -12,8 +12,6 @@ COMPLETION_WAITING_DOTS="true"
 
 DISABLE_AUTO_TITLE="true"
 
-function stitle() { echo -en "\e]2;$@\a" }
-
 # Load plugins
 plugins=(git zsh-syntax-highlighting zsh-autosuggestions)
 
@@ -27,33 +25,7 @@ source $ZSH/oh-my-zsh.sh
 export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='nvim'
-fi
-
-
-#############
-# CLI Tools #
-#############
-
-# colorls
-export PATH="$HOME/.gem/ruby/2.6.0/gems/colorls-1.4.6/exe:$PATH"
-source $(dirname $(gem which colorls))/tab_complete.sh
-alias ls="colorls"
-
-# fzf
-eval "$(fzf --zsh)"
+export EDITOR='nvim'
 
 # starship
 eval "$(starship init zsh)"
-
-# WezTerm
-export PATH="$PATH:/Applications/WezTerm.app/Contents/MacOS"
-
-# OCaml
-[[ ! -r '/Users/zhijiezhu/.opam/opam-init/init.zsh' ]] || source '/Users/zhijiezhu/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
-
-# mysql-client
-export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"

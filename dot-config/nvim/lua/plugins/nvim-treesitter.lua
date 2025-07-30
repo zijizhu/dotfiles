@@ -3,7 +3,7 @@ return {
   build = ":TSUpdate",
   config = function()
     require("nvim-treesitter.configs").setup({
-     ensure_installed = {
+      ensure_installed = {
         "c",
         "lua",
         "vim",
@@ -11,11 +11,11 @@ return {
         "python",
         "bash",
         "toml",
-        "sql",
         "yaml",
         "json",
         "go",
         "tmux",
+        "tsx",
         "typescript",
         "javascript",
         "gitignore",
@@ -24,9 +24,9 @@ return {
         "markdown",
         "markdown_inline"
       },
-     sync_install = false,
-     highlight = { enable = true },
-     indent = { enable = true }
+      sync_install = false,
+      highlight = { enable = true },
+      indent = { enable = false }
     })
   end
 }

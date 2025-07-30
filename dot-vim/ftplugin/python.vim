@@ -1,1 +1,0 @@
-nnoremap K :LspHover<CR>

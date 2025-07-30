@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set up use-package ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
- 
+
 ;; Package archives
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
@@ -23,6 +23,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General customizations ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
  
 (use-package emacs
   :init
@@ -75,7 +78,7 @@
   ;; mode.  Vertico commands are hidden in normal buffers. This setting is
   ;; useful beyond Vertico.
   (setq read-extended-command-predicate #'command-completion-default-include-p)
- 
+
   :config
  
   ;; Tweak interface
@@ -92,7 +95,10 @@
 		electric-pair-inhibit-predicate
 		(lambda
 		  (c) (eq c ?<)))
- 
+
+  ;; Dired Configuration
+  (setq dired-kill-when-opening-new-dired-buffer 1)
+
   (add-to-list 'default-frame-alist '(width  . 160))
   (add-to-list 'default-frame-alist '(height . 60))
   (add-to-list 'default-frame-alist '(left . 60))
@@ -103,6 +109,10 @@
   (set-face-attribute 'default nil :font "PragmataPro Mono" :height 130)
   (set-face-attribute 'variable-pitch nil :family "PragmataPro Mono" :height 130)
   (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :height 130)
+
+  ;; Configure languages
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
  
   ;; Config built-in tree-sitter
   ;; blog: https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
@@ -113,6 +123,9 @@
 	  (json "https://github.com/tree-sitter/tree-sitter-json")
 	  (make "https://github.com/alemuller/tree-sitter-make")
 	  (python "https://github.com/tree-sitter/tree-sitter-python")
+	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
 	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
 	  (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
  
@@ -137,6 +150,9 @@
   :ensure t
   :config
   (global-hl-todo-mode))
+
+;; (use-package kanagawa-themes
+;;   :ensure t)
  
 (use-package modus-themes
   :custom
@@ -150,16 +166,19 @@
   :config
   (setq nerd-icons-scale-factor 1.1))
 
-;; Uncomment the following region to enable spaceline
-;; Requires .el files from https://github.com/TheBB/spaceline
-;; (use-package spaceline-config
-;;   :ensure powerline
-;;   :ensure s
-;;   :load-path "spaceline"
-;;   :config
-;;   (setq powerline-default-separator "wave")
-;;   (setq powerline-height 25)
-;;   (spaceline-spacemacs-theme))
+(use-package eglot
+  :config
+  (add-to-list 'eglot-server-programs '((tsx-ts-mode :language-id "typescriptreact") . ("vtsls" "--stdio")))
+  (add-to-list 'eglot-server-programs '((typescript-ts-mode :language-id "typescript") . ("vtsls" "--stdio")))
+  (add-to-list 'eglot-server-programs '((js-ts-mode :language-id "javascript") . ("vtsls" "--stdio")))
+  (add-to-list 'eglot-server-programs '((typescript-mode :language-id "typescript") . ("vtsls" "--stdio")))
+  (add-to-list 'eglot-server-programs '((js-mode :language-id "javascript") . ("vtsls" "--stdio"))))
+
+;; Note: we can use the following packages to enhance eglot:
+;; -- eglot-booster
+;; -- emacs-lsp-booster
+;; But these might not be needed as the latest Emacs versions come with native JSON parsing
+;; Discussion: https://www.reddit.com/r/emacs/comments/1b25904/is_there_anything_i_can_do_to_make_eglots/
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -168,7 +187,12 @@
  
 (use-package vertico
   :init
-  (vertico-mode))
+  (vertico-mode)
+  :config
+  ;; Turn off case sensitivity of Emacs default completion system
+  (setq read-file-name-completion-ignore-case t
+	read-buffer-completion-ignore-case t
+	completion-ignore-case t))
  
 ;; Configure directory extension.
 (use-package vertico-directory
@@ -209,24 +233,58 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Setup code completion with corfu ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 
+
 (use-package corfu
-  :init
-  (global-corfu-mode)
   :custom
-  (corfu-auto-delay 0.2))
+  (corfu-cycle t)
+  (corfu-preselect 'prompt)
+
+  :bind
+  (:map corfu-map
+	("TAB" . corfu-next)
+        ([tab] . corfu-next)
+        ("S-TAB" . corfu-previous)
+        ([backtab] . corfu-previous))
+
+  :init
+  (global-corfu-mode))
+
+(use-package kind-icon
+  :ensure t
+  :after corfu
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package cape
   :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
   :init
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  (add-hook 'completion-at-point-functions #'cape-file)
-)
+  (add-hook 'completion-at-point-functions #'cape-file))
  
 (use-package yasnippet
   :config
   (setq yas-snippet-dirs '("~/.config/emacs/snippets"))
   (yas-global-mode))
+
+;; Integrate tree-sitter with ts, jsx and tsx files
+(use-package jtsx
+  :ensure t
+  :mode (("\\.jsx?\\'" . jtsx-jsx-mode)
+         ("\\.tsx\\'" . jtsx-tsx-mode)
+         ("\\.ts\\'" . jtsx-typescript-mode))
+  :commands jtsx-install-treesit-language
+  :hook ((jtsx-jsx-mode . hs-minor-mode)
+         (jtsx-tsx-mode . hs-minor-mode)
+         (jtsx-typescript-mode . hs-minor-mode))
+  :config
+  (defun jtsx-bind-keys-to-jtsx-jsx-mode-map ()
+      (jtsx-bind-keys-to-mode-map jtsx-jsx-mode-map))
+
+  (defun jtsx-bind-keys-to-jtsx-tsx-mode-map ()
+      (jtsx-bind-keys-to-mode-map jtsx-tsx-mode-map))
+
+  (add-hook 'jtsx-jsx-mode-hook 'jtsx-bind-keys-to-jtsx-jsx-mode-map)
+  (add-hook 'jtsx-tsx-mode-hook 'jtsx-bind-keys-to-jtsx-tsx-mode-map))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -239,14 +297,21 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX editting with AucTex ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 
+
 (use-package tex
   :ensure auctex
   :ensure adaptive-wrap
   :config
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
+  (setq TeX-source-correlate-method 'synctex
+	TeX-view-program-list   ;; Use Skim, it's awesome
+	'(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -g -b %n %o %b"))
+	TeX-view-program-selection '((output-pdf "Skim"))
+	TeX-auto-save t
+	TeX-parse-self t
+	TeX-save-query nil
+	TeX-master 'dwim)
   (setq LaTeX-item-indent 0)
+  (setq TeX-parse-self t)
   (setq-default TeX-master nil)
   (setq-default adaptive-wrap-extra-indent 0)
   (add-hook 'LaTeX-mode-hook #'adaptive-wrap-prefix-mode)
@@ -281,7 +346,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Emacs Plus has a feature that injects $PATH variable
-;; So this is not needed for $PATH, but still useful for other env vars
+;; So this is not needed for $PATH on macOS, but still useful on other devices or for other env vars
 (use-package exec-path-from-shell)
 (exec-path-from-shell-copy-env "LIBGS")
 

@@ -1,5 +1,5 @@
 [character]
-success_symbol = '[->](bold yellow)'
+success_symbol = '[󱐋](bold yellow)'
 error_symbol = '[✘](bold red)'
 
 [aws]

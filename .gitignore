@@ -1,4 +1,9 @@
-dot-vim/plugged
-dot-vim/.netrwhist
 dot-config/emacs/eln-cache
 dot-config/emacs/elpa
+dot-config/emacs/eshell
+dot-config/emacs/extras
+dot-config/emacs/tree-sitter
+dot-config/emacs/bookmarks
+dot-config/emacs/tramp
+
+.cache
