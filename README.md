@@ -9,11 +9,30 @@ This includes the config files for:
 - [GNU Emacs](https://www.gnu.org/software/emacs/)
 
 Usage:
+
+To stow the `emacs` package into `$HOME/.config` directory:
+
 ```bash
-stow --dotfiles .
+stow -v --no-folding --dotfiles emacs
 ```
 
-As well as the `.bashrc`, `.zshrc` files.
+To stow the rest of packages:
+
+```bash
+stow -v --dotfiles --ignore=emacs .
+```
+
+To clean up the stow of `emacs` package:
+
+```bash
+stow -v -D --no-folding --dotfiles emacs && rmdir $HOME/.config/emacs
+```
+
+To clean up the rest of the stowed packages:
+
+```bash
+stow -v -D --dotfiles --ignore=emacs .
+```
 
 ## 📦 Installation of Other Tools
 

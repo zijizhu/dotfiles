@@ -4,6 +4,8 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Make the curor in insert mode a block
+vim.opt.guicursor = "n-v-c:block,i:block"
 -- Disable the default behaviour of <s> key in normal mode
 vim.keymap.set({ 'n', 'v' }, 's', '<Nop>')
 
@@ -29,8 +31,9 @@ vim.o.softtabstop = 2 -- number of spaces a <Tab> counts for. When 0, feature is
 
 vim.o.pumheight = 20 -- limit popup height
 vim.o.number = true -- display line number
-
 vim.o.relativenumber = true
+
+-- Rest of the lines are shown on the next line if too long to fit on the screen
 vim.o.breakindent = true
 
 -- [[ Install `lazy.nvim` plugin manager ]]

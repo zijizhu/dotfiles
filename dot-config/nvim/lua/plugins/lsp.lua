@@ -9,7 +9,14 @@ return {
     "williamboman/mason-lspconfig.nvim",
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "bashls", "pylsp" }
+        ensure_installed = {
+          "lua_ls",
+          "bashls",
+          "ruff",
+          "clangd",
+          "dockerls",
+          "rust_analyzer"
+        }
       })
     end
   },
@@ -18,10 +25,45 @@ return {
     config = function()
       -- [[ Language specific settings ]]
       -- Python
+      vim.lsp.config('ruff', {
+        init_options = {
+          settings = {
+            -- Server settings should go here
+          }
+        }
+      })
+      -- C/C++
+      vim.lsp.enable('clangd')
+
+      -- Bash
       vim.lsp.enable("bashls")
 
-      -- TypeScript/JavaScript
+      -- PostgreSQL
       vim.lsp.enable("postgres_lsp")
+
+      -- docker
+      vim.lsp.config('dockerls', {
+        settings = {
+          docker = {
+            languageserver = {
+              formatter = {
+                ignoreMultilineInstructions = true,
+              },
+            },
+          }
+        }
+      })
+
+      -- Rust
+      vim.lsp.config('rust_analyzer', {
+        settings = {
+          ['rust-analyzer'] = {
+            diagnostics = {
+              enable = false;
+            }
+          }
+        }
+      })
 
       -- Lua
       vim.lsp.config('lua_ls', {
@@ -72,7 +114,7 @@ return {
           Lua = {}
         }
       })
-
+      vim.lsp.enable("ts_go_ls")
     end
   },
 }
