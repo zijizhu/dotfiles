@@ -15,6 +15,9 @@ return {
           "ruff",
           "clangd",
           "dockerls",
+          "ltex",
+          "tinymist",
+          "marksman",
           "rust_analyzer"
         }
       })
@@ -40,6 +43,15 @@ return {
 
       -- PostgreSQL
       vim.lsp.enable("postgres_lsp")
+
+      -- LTEX
+      vim.lsp.enable('ltex')
+
+      -- Marksman
+      vim.lsp.enable('marksman')
+
+      -- typst
+      vim.lsp.enable('tinymist')
 
       -- docker
       vim.lsp.config('dockerls', {
