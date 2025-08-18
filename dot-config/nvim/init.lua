@@ -5,12 +5,9 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Make the curor in insert mode a block
-vim.opt.guicursor = "n-v-c:block,i:block"
+-- vim.opt.guicursor = "n-v-c:block,i:block"
 -- Disable the default behaviour of <s> key in normal mode
 vim.keymap.set({ 'n', 'v' }, 's', '<Nop>')
-
-vim.keymap.set({ 'n', 'v' }, 'H', '^')
-vim.keymap.set({ 'n', 'v' }, 'L', '$')
 
 -- [[ Clipboard and Register Settings ]]
 -- Sync clipboard between OS and Neovim.
@@ -20,7 +17,6 @@ vim.api.nvim_set_keymap('x', 'p', 'P', { noremap = true, silent = true })
 
 -- https://stackoverflow.com/q/916875/17662217
 vim.keymap.set({ 'n' }, '<Leader>p', ':let @+=expand("%")<CR>')
-vim.keymap.set('n', '<leader>ft', ':TodoTelescope<enter>')
 
 -- [[ Default Tab and Indentation Settings ]]
 -- Language specific settings are in ./after/ftplugin/
@@ -52,5 +48,3 @@ end
 vim.opt.rtp:prepend(lazypath)
 -- [[ Setup plugins ]]
 require("lazy").setup("plugins")
-
-require('user_commands')

@@ -5,7 +5,8 @@
 ;; Package archives
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+                         ("elpa" . "https://elpa.gnu.org/packages/")
+			 ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
  
 (package-initialize)
 (unless package-archive-contents
@@ -23,21 +24,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General customizations ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(exec-path-from-shell-initialize)
+;; (when (memq window-system '(mac ns x))
+;;   (exec-path-from-shell-initialize))
 
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
- 
 (use-package emacs
   :init
-  ;; On macOS, bind the Command key to Meta 
-  (setq mac-option-key-is-meta nil
-	mac-command-key-is-meta t
-	mac-command-modifier 'meta
-	mac-option-modifier 'none)
-  
+
   ;; Enable indentation+completion using the TAB key.
   (setq tab-always-indent 'complete)
   (setq read-extended-command-predicate #'command-completion-default-include-p)
+
+  ;; Turn off the ring bell
+  (setq ring-bell-function 'ignore)
+
+  ;; Maximize frame on startup
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
  
   ;; Tweak backup settings
   (if (not (file-directory-p "~/.backups"))
@@ -99,16 +101,10 @@
   ;; Dired Configuration
   (setq dired-kill-when-opening-new-dired-buffer 1)
 
-  (add-to-list 'default-frame-alist '(width  . 160))
-  (add-to-list 'default-frame-alist '(height . 60))
-  (add-to-list 'default-frame-alist '(left . 60))
-  (add-to-list 'default-frame-alist '(top . 60))
-  ; Make macos title bar transparent
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   ;; Set font face
-  (set-face-attribute 'default nil :font "PragmataPro Mono" :height 130)
-  (set-face-attribute 'variable-pitch nil :family "PragmataPro Mono" :height 130)
-  (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :height 130)
+  (set-face-attribute 'default nil :font "PragmataPro" :height 130)
+  (set-face-attribute 'variable-pitch nil :family "PragmataPro" :height 130)
+  (set-face-attribute 'fixed-pitch nil :font "PragmataPro" :height 130)
 
   ;; Configure languages
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
@@ -117,11 +113,15 @@
   ;; Config built-in tree-sitter
   ;; blog: https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
   ;; starter guide: https://github.com/emacs-mirror/emacs/blob/master/admin/notes/tree-sitter/starter-guide
+  ;; NOTE tree-sitter grammers currently do have have a versioning system, so sometimes latest releases might not work
+  ;; For example, we need specify versions that work for C and C++: https://github.com/tree-sitter/tree-sitter-cpp/issues/271
   (setq treesit-language-source-alist
 	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
 	  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
 	  (json "https://github.com/tree-sitter/tree-sitter-json")
 	  (make "https://github.com/alemuller/tree-sitter-make")
+	  (c "https://github.com/tree-sitter/tree-sitter-c" "v0.20.7")
+	  (cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")
 	  (python "https://github.com/tree-sitter/tree-sitter-python")
 	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
 	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
@@ -133,6 +133,8 @@
   ;; AucTex package utilizes variable major-mode-remap-alist
   ;; So we must use add-to-list instead of setq to not break AucTex
   ;; (add-to-list 'major-mode-remap-alist '(elisp-mode . elisp-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(cpp-mode . cpp-ts-mode))
   (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
   (add-to-list 'major-mode-remap-alist '(bash-mode . bash-ts-mode))
   (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
@@ -151,9 +153,6 @@
   :config
   (global-hl-todo-mode))
 
-;; (use-package kanagawa-themes
-;;   :ensure t)
- 
 (use-package modus-themes
   :custom
   (modus-themes-mixed-fonts t)
@@ -166,13 +165,13 @@
   :config
   (setq nerd-icons-scale-factor 1.1))
 
-(use-package eglot
-  :config
-  (add-to-list 'eglot-server-programs '((tsx-ts-mode :language-id "typescriptreact") . ("vtsls" "--stdio")))
-  (add-to-list 'eglot-server-programs '((typescript-ts-mode :language-id "typescript") . ("vtsls" "--stdio")))
-  (add-to-list 'eglot-server-programs '((js-ts-mode :language-id "javascript") . ("vtsls" "--stdio")))
-  (add-to-list 'eglot-server-programs '((typescript-mode :language-id "typescript") . ("vtsls" "--stdio")))
-  (add-to-list 'eglot-server-programs '((js-mode :language-id "javascript") . ("vtsls" "--stdio"))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Language integration with eglot ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package eglot)
+ ;; :config
+ ;; (add-to-list 'eglot-server-programs '((c-ts-mode :language-id "c") . ("clangd" "--stdio"))))
 
 ;; Note: we can use the following packages to enhance eglot:
 ;; -- eglot-booster
@@ -230,9 +229,9 @@
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
  
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Setup code completion with corfu ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Setup code completion with corfu, cape and magit ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package corfu
   :custom
@@ -266,62 +265,16 @@
   (setq yas-snippet-dirs '("~/.config/emacs/snippets"))
   (yas-global-mode))
 
-;; Integrate tree-sitter with ts, jsx and tsx files
-(use-package jtsx
-  :ensure t
-  :mode (("\\.jsx?\\'" . jtsx-jsx-mode)
-         ("\\.tsx\\'" . jtsx-tsx-mode)
-         ("\\.ts\\'" . jtsx-typescript-mode))
-  :commands jtsx-install-treesit-language
-  :hook ((jtsx-jsx-mode . hs-minor-mode)
-         (jtsx-tsx-mode . hs-minor-mode)
-         (jtsx-typescript-mode . hs-minor-mode))
-  :config
-  (defun jtsx-bind-keys-to-jtsx-jsx-mode-map ()
-      (jtsx-bind-keys-to-mode-map jtsx-jsx-mode-map))
-
-  (defun jtsx-bind-keys-to-jtsx-tsx-mode-map ()
-      (jtsx-bind-keys-to-mode-map jtsx-tsx-mode-map))
-
-  (add-hook 'jtsx-jsx-mode-hook 'jtsx-bind-keys-to-jtsx-jsx-mode-map)
-  (add-hook 'jtsx-tsx-mode-hook 'jtsx-bind-keys-to-jtsx-tsx-mode-map))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; git management with magit ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  
 (use-package magit)
- 
- 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; LaTeX editting with AucTex ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package tex
-  :ensure auctex
-  :ensure adaptive-wrap
-  :config
-  (setq TeX-source-correlate-method 'synctex
-	TeX-view-program-list   ;; Use Skim, it's awesome
-	'(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -g -b %n %o %b"))
-	TeX-view-program-selection '((output-pdf "Skim"))
-	TeX-auto-save t
-	TeX-parse-self t
-	TeX-save-query nil
-	TeX-master 'dwim)
-  (setq LaTeX-item-indent 0)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil)
-  (setq-default adaptive-wrap-extra-indent 0)
-  (add-hook 'LaTeX-mode-hook #'adaptive-wrap-prefix-mode)
-  (add-hook 'LaTeX-mode-hook #'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook #'visual-line-mode))
- 
- 
-;;;;;;;;;;;;;;;;;;;;;
-;; Config org-mode ;;
-;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; Configure org-mode ;;
+;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package olivetti
   :custom
@@ -333,22 +286,21 @@
 	      (olivetti-mode 1)
 	      (flyspell-mode 1)
 	      (visual-line-mode)
-	      (display-line-numbers-mode -1)
+	      (display-line-numbers-mode -1)))
 	      ;; LaTeX formatting in Org Mode
-	      (setq org-format-latex-options (plist-put org-format-latex-options :background "Transparent"))
-	      (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))))
+	      ;; (setq org-format-latex-options (plist-put org-format-latex-options :background "Transparent"))
+	      ;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))))
   (setq org-startup-indented t)
   (setq org-preview-latex-default-process 'dvisvgm))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Config env variables ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Configure env variables ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Emacs Plus has a feature that injects $PATH variable
 ;; So this is not needed for $PATH on macOS, but still useful on other devices or for other env vars
 (use-package exec-path-from-shell)
-(exec-path-from-shell-copy-env "LIBGS")
 
 (use-package envrc
   :hook (after-init . envrc-global-mode))

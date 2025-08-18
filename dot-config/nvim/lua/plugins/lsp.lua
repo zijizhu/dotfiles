@@ -36,7 +36,10 @@ return {
         }
       })
       -- C/C++
-      vim.lsp.enable('clangd')
+      -- NOTE: The `--enable-config` flag will work with clangd-21
+      vim.lsp.enable('clangd', {
+        cmd = { 'clangd', '--enable-config' }
+      })
 
       -- Bash
       vim.lsp.enable("bashls")

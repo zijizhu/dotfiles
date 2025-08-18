@@ -1,0 +1,13 @@
+theme = "kanagawa"
+
+[editor]
+line-number = "relative"
+
+[editor.file-picker]
+hidden = true
+
+[editor.soft-wrap]
+enable = true
+max-wrap = 25 # increase value to reduce forced mid-word wrapping
+max-indent-retain = 0
+

@@ -9,8 +9,6 @@ return {
     require("fzf-lua").setup({
       winopts = {
         backdrop = 100,
-        border = "single",
-        preview = { border = "border-sharp" }
       }
     })
     vim.keymap.set('n', '<leader>f', function() require("fzf-lua").files() end, {})
