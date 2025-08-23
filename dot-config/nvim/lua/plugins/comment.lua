@@ -1,15 +1,24 @@
 return {
-  'JoosepAlviste/nvim-ts-context-commentstring',
-  config=function()
-    require('ts_context_commentstring').setup {
-      enable_autocmd = false
-    }
+    {
+        "JoosepAlviste/nvim-ts-context-commentstring",
+        config = function()
+            require("ts_context_commentstring").setup({
+                enable_autocmd = false,
+            })
+        end,
+    },
+    {
 
-    local get_option = vim.filetype.get_option
-    vim.filetype.get_option = function(filetype, option)
-      return option == "commentstring"
-        and require("ts_context_commentstring.internal").calculate_commentstring()
-        or get_option(filetype, option)
-    end
-  end
+        "folke/todo-comments.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        opts = {
+            -- your configuration comes here
+            -- or leave it empty to use the default settings
+            -- refer to the configuration section below
+        },
+        config = function()
+            require("todo-comments").setup()
+            vim.keymap.set("n", "<leader>t", ":TodoFzfLua<enter>")
+        end,
+    },
 }
